@@ -10,16 +10,47 @@ app.get('/pokemons/', function(req, res) {
 	var pokemons = [];
 
 	db.serialize(function() {
-		db.each("SELECT rowid AS id, name FROM pokemons ORDER BY rowid", function(err, row) {
+		db.each("SELECT pokemons.rowid AS id, pokemons.name, description, height, weight, type1.rowid AS type1_id, type1.name AS type1_name, type2.rowid AS type2_id, type2.name AS type2_name, pv, atk, def, atkspe, defspe, vit FROM pokemons LEFT JOIN stats ON pokemons.rowid = stats.id LEFT JOIN types AS type1 ON pokemons.type1 = type1.rowid LEFT JOIN types AS type2 ON pokemons.type2 = type2.rowid ORDER BY id", function(err, row) {
 			if (err) {
 				console.error(err);
 			}
 			else {
-				console.log(row.id + ": " + row.name);
-				pokemons.push({
+				// Base pokémon
+				var pokemon = {
 					'id': row.id,
-					'name': row.name
-				});
+					'name': row.name,
+					'description': row.description,
+					'height': row.height,
+					'weight': row.weight
+				};
+
+				// types
+				var types = [];
+				if (row.type1_id != null) {
+					types.push({
+						'id': row.type1_id,
+						'name': row.type1_name
+					});
+				}
+				if (row.type2_id != null) {
+					types.push({
+						'id': row.type2_id,
+						'name': row.type2_name
+					});
+				}
+				pokemon['types'] = types;
+
+				// stats
+				var stats = {
+					'pv': row.pv,
+					'atk': row.atk,
+					'def': row.def,
+					'atkspe': row.atkspe,
+					'defspe': row.defspe,
+					'vit': row.vit
+				};
+				pokemon['stats'] = stats;
+				pokemons.push(pokemon);
 			}
 		}, function() {
 			res.setHeader('Content-Type', 'application/json');
@@ -28,6 +59,30 @@ app.get('/pokemons/', function(req, res) {
 	});
 	db.close();
 });
+// app.get('/pokemons/', function(req, res) {
+// 	var db = new sqlite3.Database('poke.db');
+//
+// 	var pokemons = [];
+//
+// 	db.serialize(function() {
+// 		db.each("SELECT rowid AS id, name FROM pokemons ORDER BY rowid", function(err, row) {
+// 			if (err) {
+// 				console.error(err);
+// 			}
+// 			else {
+// 				console.log(row.id + ": " + row.name);
+// 				pokemons.push({
+// 					'id': row.id,
+// 					'name': row.name
+// 				});
+// 			}
+// 		}, function() {
+// 			res.setHeader('Content-Type', 'application/json');
+// 			res.send(JSON.stringify(pokemons));
+// 		});
+// 	});
+// 	db.close();
+// });
 
 app.get('/pokemons/:no/', function(req, res) {
 	var db = new sqlite3.Database('poke.db');
