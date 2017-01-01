@@ -1,6 +1,6 @@
-# SwiftPokedexAPI
+# SwiftyDexAPI
 
-This is the API working with the [SwiftPokedex iOS application](http://www.github.com/siilver777/SwiftPokedex). The API is entirely written in NodeJS and uses ExpressJS. The database is managed with SQLite.
+This is the API working with the [SwiftPokedex iOS application](http://www.github.com/siilver777/SwiftyDex). The API is entirely written in NodeJS and uses ExpressJS. The database is managed with SQLite.
 
 ## Requirements
 
